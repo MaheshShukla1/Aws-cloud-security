@@ -1,3 +1,207 @@
+# Boto3 Learning Guide
+
+Welcome to the Boto3 Learning Guide! This repository aims to help you learn Boto3, the AWS SDK for Python, with in-depth explanations and practical code examples.
+
+## Table of Contents
+
+1. [Introduction to Boto3](#introduction-to-boto3)
+2. [Setting Up Boto3](#setting-up-boto3)
+3. [Boto3 Basics](#boto3-basics)
+   - [Uploading Files to S3](#uploading-files-to-s3)
+   - [Removing Users from IAM Groups](#removing-users-from-iam-groups)
+4. [Intermediate Boto3 with IAM](#intermediate-boto3-with-iam)
+   - [Creating and Managing IAM Policies](#creating-and-managing-iam-policies)
+   - [Attaching a Policy to a User](#attaching-a-policy-to-a-user)
+   - [Managing IAM Roles](#managing-iam-roles)
+     - [Creating a Role with a Trust Policy](#creating-a-role-with-a-trust-policy)
+     - [Attaching a Policy to a Role](#attaching-a-policy-to-a-role)
+   - [Advanced IAM Policy Management](#advanced-iam-policy-management)
+5. [Error Handling](#error-handling)
+   - [Handling Missing Argument Errors](#handling-missing-argument-errors)
+   - [Handling Access Denied Errors](#handling-access-denied-errors)
+6. [Additional Resources](#additional-resources)
+
+## Introduction to Boto3
+
+Boto3 is the Amazon Web Services (AWS) SDK for Python, which allows Python developers to write software that makes use of Amazon services like S3 and EC2.
+
+## Setting Up Boto3
+
+To start using Boto3, you need to install it and set up your AWS credentials.
+
+### Installation
+
+You can install Boto3 using pip:
+
+```bash
+pip install boto3
+```
+
+## Boto3 Basics
+#### Uploading Files to S3
+###### Here's a simple example of how to upload a file to an S3 bucket
+```python
+import boto3
+
+s3_client = boto3.client('s3')
+
+try:
+    response = s3_client.upload_file('index.py', 'mybucket', 'Team/Developers/index.py')
+    print("File uploaded successfully.")
+except Exception as e:
+    print(f"An error occurred: {e}")
+```
+## Removing Users from IAM Groups
+```python
+import boto3
+
+iam_client = boto3.client('iam')
+
+response = iam_client.remove_user_from_group(
+    GroupName='Developers',
+    UserName='JaneDoe'
+)
+
+print(response)
+```
+## Intermediate Boto3 with IAM
+#### Creating and Managing IAM Policies
+```python
+import boto3
+import json
+
+iam_client = boto3.client('iam')
+
+policy_document = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        }
+    ]
+}
+
+response = iam_client.create_policy(
+    PolicyName='S3FullAccessPolicy',
+    PolicyDocument=json.dumps(policy_document)
+)
+
+print(response)
+```
+#### Attaching a policy to a user
+```python
+response = iam_client.attach_user_policy(
+    UserName='JohnDoe',
+    PolicyArn='arn:aws:iam::aws:policy/S3FullAccessPolicy'
+)
+
+print(response)
+```
+
+## Managing IAM Roles
+#### Creating a role with a trust policy
+```python
+import boto3
+import json
+
+iam_client = boto3.client('iam')
+
+trust_policy = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+
+response = iam_client.create_role(
+    RoleName='EC2S3AccessRole',
+    AssumeRolePolicyDocument=json.dumps(trust_policy)
+)
+
+print(response)
+```
+#### Attaching a policy to a role
+```python
+response = iam_client.attach_role_policy(
+    RoleName='EC2S3AccessRole',
+    PolicyArn='arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+)
+
+print(response)
+```
+
+## Advanced IAM Policy Management
+#### Updating an IAM policy
+```python
+policy_document = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::example-bucket",
+                "arn:aws:s3:::example-bucket/*"
+            ]
+        }
+    ]
+}
+
+response = iam_client.create_policy_version(
+    PolicyArn='arn:aws:iam::aws:policy/S3FullAccessPolicy',
+    PolicyDocument=json.dumps(policy_document),
+    SetAsDefault=True
+)
+
+print(response)
+```
+
+## Error Handling
+#### Handling Missing Argument Errors
+
+```python
+# Missing Argument Error
+import boto3
+
+s3_client = boto3.client('s3')
+
+try:
+    response = s3_client.upload_file('index.py', 'mybucket', 'Team/Developers/index.py')
+    print("File uploaded successfully.")
+except TypeError as e:
+    print(f"TypeError: {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+```
+#### Handling Access Denied Errors
+
+```python
+try:
+    response = s3_client.upload_file('index.py', 'mybucket', 'Team/Developers/index.py')
+except s3_client.exceptions.AccessDenied as e:
+    print(f"AccessDenied: {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+```
+## Additional Resources
+#### [Boto3 Docs](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
+#### [AWS IAM Documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
+#### [AWS IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/IAMBestPracticesAndUseCases.html)
+#### [AWS IAM Policy Simulator](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_testing-policies.html)
+
+
+
 ## [AWS CLI IAM ](https://github.com/MaheshShukla1/Aws-cloud-security/wiki/AWS-CLI-IAM)
 ### Cloud Computing Overview
 
